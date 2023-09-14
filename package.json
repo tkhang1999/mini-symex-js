@@ -7,6 +7,7 @@
   "scripts": {
     "build": "babel src -d dist",
     "symbolic": "export Z3_PATH=./node_modules/z3javascript/bin/libz3.so && npm run build && node dist/app.js",
+    "prettier": "prettier . --write",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -28,6 +29,7 @@
   "devDependencies": {
     "@babel/cli": "^7.22.15",
     "@babel/core": "^7.22.17",
-    "@babel/preset-env": "^7.22.15"
+    "@babel/preset-env": "^7.22.15",
+    "prettier": "3.0.3"
   }
 }
