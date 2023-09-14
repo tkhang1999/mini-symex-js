@@ -4,10 +4,10 @@ import { strict as assert } from "assert";
 const test = (x, y, z) => {
   if (x === y) {
     if (y === z) {
-      if (x === z) {
-        assert(false);
-      } else {
+      if (x !== z) {
         assert(true);
+      } else {
+        assert(false);
       }
     }
   }
