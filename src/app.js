@@ -1,29 +1,18 @@
-import { SymbolicInt, solvers } from './symbolic.js';
-import { initZ3, z3 } from './utils.js';
-
+import { SymbolicInt, symExe } from './symbolic.js';
+import { strict as assert } from 'assert';
 
 const test = (x, y, z) => {
     if (x === y) {
         if (y === z) {
-            console.log("1");
-            return;
+            if (x === z) {
+                assert(false);
+            } else {
+                assert(true);
+            }
         }
-        console.log("2")
-        return;
     }
-    console.log("3");
-    return;
 }
 
-(async () => {
-    await initZ3();
+const fArgs = [new SymbolicInt('x'), new SymbolicInt('y'), new SymbolicInt('z')];
 
-    solvers.push(new z3.Solver());
-
-    test(new SymbolicInt('x'), new SymbolicInt('y'),  new SymbolicInt('z'));
-
-    console.log(solvers.length);
-})().catch(e => {
-    console.error('error', e);
-    process.exit(1);
-});
+symExe(test, fArgs);
