@@ -1,12 +1,10 @@
 import {
   solver,
-  getZ3Ctx,
   counter,
   readCounter,
   args,
-  addArg,
-  addCons,
   constraints,
+  z3Ctx,
 } from "./utils";
 import { spawnSync } from "child_process";
 
@@ -15,24 +13,27 @@ export const symbolicBool = (sym, isChild) => {
 
   if (!isChild) {
     if (counter === args.length + 1) {
-      const nextArgs = [...args];
-      nextArgs.push("true");
-      const child = spawnSync(process.argv[0], [process.argv[1], ...nextArgs], {
-        encoding: "utf-8",
-      });
+      const childArgs = [...args, "true"];
+      const child = spawnSync(
+        process.argv[0],
+        [process.argv[1], ...childArgs],
+        {
+          encoding: "utf-8",
+        },
+      );
       console.log(child.stdout);
     }
     solver.assert(sym);
     result = true;
-    addCons(`assume ${sym}`);
+    constraints.push(`assume ${sym}`);
   } else {
-    solver.assert(getZ3Ctx().mkNot(sym));
+    solver.assert(z3Ctx.mkNot(sym));
     result = false;
-    addCons(`assume (not ${sym})`);
+    constraints.push(`assume (not ${sym})`);
   }
 
   if (counter === args.length + 1) {
-    addArg("false");
+    args.push("false");
   }
 
   if (!solver.check()) {
@@ -48,24 +49,21 @@ export class SymbolicInt {
   expr;
 
   constructor(id) {
-    const ctx = getZ3Ctx();
     this.id = id;
-    this.expr = ctx.mkIntVar(this.id);
+    this.expr = z3Ctx.mkIntVar(this.id);
   }
 
   [Symbol.for("===")](other) {
-    const ctx = getZ3Ctx();
     return symbolicBool(
-      ctx.mkEq(this.expr, other.getZ3Expr()),
+      z3Ctx.mkEq(this.expr, other.getZ3Expr()),
       args[readCounter()] === "true",
     );
     // symbolicBool(Z3.Eq(z3.Int.const(this.id), z3.Int.const(other.id)));
   }
 
   [Symbol.for("!==")](other) {
-    const ctx = getZ3Ctx();
     return symbolicBool(
-      ctx.mkNot(ctx.mkEq(this.expr, other.getZ3Expr())),
+      z3Ctx.mkNot(z3Ctx.mkEq(this.expr, other.getZ3Expr())),
       args[readCounter()] === "true",
     );
     // symbolicBool(z3.Not(z3.Eq(z3.Int.const(this.id), z3.Int.const(other.id))));
