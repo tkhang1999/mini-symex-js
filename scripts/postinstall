@@ -1,2 +1,0 @@
-#!/usr/bin/env bash
-cd node_modules/z3javascript && npm install

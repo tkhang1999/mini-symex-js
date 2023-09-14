@@ -5,7 +5,7 @@
   "type": "commonjs",
   "main": "src/app.js",
   "scripts": {
-    "postinstall": "./scripts/postinstall",
+    "build:z3javascript": "cd ./node_modules/z3javascript && npm install",
     "build": "babel src -d dist",
     "symbolic": "export Z3_PATH=./node_modules/z3javascript/bin/libz3.so && npm run build && node dist/app.js",
     "prettier": "prettier . --write",
