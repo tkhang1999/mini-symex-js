@@ -5,6 +5,7 @@
   "type": "commonjs",
   "main": "src/app.js",
   "scripts": {
+    "postinstall": "./scripts/postinstall",
     "build": "babel src -d dist",
     "symbolic": "export Z3_PATH=./node_modules/z3javascript/bin/libz3.so && npm run build && node dist/app.js",
     "prettier": "prettier . --write",
@@ -24,7 +25,7 @@
     "babel-plugin-overload": "^0.0.2",
     "babel-template": "^6.26.0",
     "install": "^0.13.0",
-    "z3-solver": "^4.12.2"
+    "z3javascript": "github:tkhang1999/z3javascript"
   },
   "devDependencies": {
     "@babel/cli": "^7.22.15",

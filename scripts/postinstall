@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-git clone https://github.com/tkhang1999/z3javascript.git node_modules/z3javascript && cd node_modules/z3javascript && npm install
+cd node_modules/z3javascript && npm install
