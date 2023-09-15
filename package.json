@@ -24,6 +24,7 @@
   "dependencies": {
     "babel-plugin-overload": "^0.0.2",
     "babel-template": "^6.26.0",
+    "fractional": "^1.0.0",
     "install": "^0.13.0",
     "z3javascript": "github:tkhang1999/z3javascript"
   },

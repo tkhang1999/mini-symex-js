@@ -1,12 +1,6 @@
-import {
-  solver,
-  readCounter,
-  args,
-  constraints,
-  z3Ctx,
-  decimalToFraction,
-} from "./utils";
+import { solver, readCounter, args, constraints, z3Ctx } from "./utils";
 import { spawnSync } from "child_process";
+import { Fraction } from "fractional";
 
 export const symbolicBool = (expr, shouldNegate) => {
   let result = undefined;
@@ -50,8 +44,8 @@ export const symbolicBool = (expr, shouldNegate) => {
 const getNumZ3Expr = (i) => {
   if (typeof i === "number") {
     // as Z3 does not support decimal number we need to convert it to fraction
-    const { top, bottom } = decimalToFraction(i);
-    return z3Ctx.mkDiv(z3Ctx.mkIntVal(top), z3Ctx.mkIntVal(bottom));
+    const { numerator, denominator } = new Fraction(i);
+    return z3Ctx.mkDiv(z3Ctx.mkIntVal(numerator), z3Ctx.mkIntVal(denominator));
   }
   return i.getZ3Expr();
 };
