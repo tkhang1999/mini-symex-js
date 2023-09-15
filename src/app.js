@@ -1,12 +1,12 @@
-import { SymbolicInt, symExe } from "./symbolic.js";
+import { SymbolicNumber, symExe } from "./symbolic.js";
 import { strict as assert } from "assert";
 
 const test = (x, y, z) => {
-  if (x === y) {
-    if (y === z) {
-      if (x !== z) {
-        assert(true);
-      } else {
+  if (x === y ** 2) {
+    const t = y + 1;
+    if (t > z - 3) {
+      const u = z * 2.5;
+      if (x <= u / 4) {
         assert(false);
       }
     }
@@ -14,9 +14,9 @@ const test = (x, y, z) => {
 };
 
 const fArgs = [
-  new SymbolicInt("x"),
-  new SymbolicInt("y"),
-  new SymbolicInt("z"),
+  new SymbolicNumber("x"),
+  new SymbolicNumber("y"),
+  new SymbolicNumber("z"),
 ];
 
 symExe(test, fArgs);

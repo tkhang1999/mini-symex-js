@@ -1,11 +1,18 @@
-import { solver, readCounter, args, constraints, z3Ctx } from "./utils";
+import {
+  solver,
+  readCounter,
+  args,
+  constraints,
+  z3Ctx,
+  decimalToFraction,
+} from "./utils";
 import { spawnSync } from "child_process";
 
 export const symbolicBool = (expr, shouldNegate) => {
   let result = undefined;
 
   if (shouldNegate !== "true") {
-    // if this condition is encountered for the first time based on args length,
+    // if this condition is encountered for the first time as "args[counter] === undefined",
     // a child process will be spawned to negate this condition to take another path.
     if (shouldNegate === undefined) {
       // child process to negate "expr"
@@ -40,32 +47,103 @@ export const symbolicBool = (expr, shouldNegate) => {
   return result;
 };
 
+const getNumZ3Expr = (i) => {
+  if (typeof i === "number") {
+    // as Z3 does not support decimal number we need to convert it to fraction
+    const { top, bottom } = decimalToFraction(i);
+    return z3Ctx.mkDiv(z3Ctx.mkIntVal(top), z3Ctx.mkIntVal(bottom));
+  }
+  return i.getZ3Expr();
+};
+
 /**
- * SymbolicInt is a wrapper class to represent integer symbolic values using Z3 expression.
+ * SymbolicNumber is a wrapper class to represent number symbolic values using Z3 expression.
  *
  * Operator overloading is needed for symbolic execution.
  */
-export class SymbolicInt {
-  id;
+export class SymbolicNumber {
   expr;
 
-  constructor(id) {
-    this.id = id;
-    this.expr = z3Ctx.mkIntVar(this.id);
+  constructor(expr) {
+    if (typeof expr === "string") {
+      this.expr = z3Ctx.mkRealVar(expr);
+    } else {
+      this.expr = expr;
+    }
   }
 
   [Symbol.for("===")](other) {
     return symbolicBool(
-      z3Ctx.mkEq(this.expr, other.getZ3Expr()),
+      z3Ctx.mkEq(this.expr, getNumZ3Expr(other)),
       args[readCounter()],
     );
   }
 
+  [Symbol.for("==")](other) {
+    return this === other;
+  }
+
   [Symbol.for("!==")](other) {
     return symbolicBool(
-      z3Ctx.mkNot(z3Ctx.mkEq(this.expr, other.getZ3Expr())),
+      z3Ctx.mkNot(z3Ctx.mkEq(this.expr, getNumZ3Expr(other))),
       args[readCounter()],
     );
+  }
+
+  [Symbol.for("!=")](other) {
+    return this !== other;
+  }
+
+  [Symbol.for("<")](other) {
+    return symbolicBool(
+      z3Ctx.mkLt(this.expr, getNumZ3Expr(other)),
+      args[readCounter()],
+    );
+  }
+
+  [Symbol.for("<=")](other) {
+    return symbolicBool(
+      z3Ctx.mkLe(this.expr, getNumZ3Expr(other)),
+      args[readCounter()],
+    );
+  }
+
+  [Symbol.for(">")](other) {
+    return symbolicBool(
+      z3Ctx.mkGt(this.expr, getNumZ3Expr(other)),
+      args[readCounter()],
+    );
+  }
+
+  [Symbol.for(">=")](other) {
+    return symbolicBool(
+      z3Ctx.mkGe(this.expr, getNumZ3Expr(other)),
+      args[readCounter()],
+    );
+  }
+
+  [Symbol.for("+")](other) {
+    return new SymbolicNumber(z3Ctx.mkAdd(this.expr, getNumZ3Expr(other)));
+  }
+
+  [Symbol.for("-")](other) {
+    return new SymbolicNumber(z3Ctx.mkSub(this.expr, getNumZ3Expr(other)));
+  }
+
+  [Symbol.for("*")](other) {
+    return new SymbolicNumber(z3Ctx.mkMul(this.expr, getNumZ3Expr(other)));
+  }
+
+  [Symbol.for("/")](other) {
+    return new SymbolicNumber(z3Ctx.mkDiv(this.expr, getNumZ3Expr(other)));
+  }
+
+  [Symbol.for("%")](other) {
+    return new SymbolicNumber(z3Ctx.mkMod(this.expr, getNumZ3Expr(other)));
+  }
+
+  [Symbol.for("**")](other) {
+    return new SymbolicNumber(z3Ctx.mkPower(this.expr, getNumZ3Expr(other)));
   }
 
   getZ3Expr() {
@@ -85,8 +163,7 @@ export const symExe = (f, fArgs) => {
 Constraints: ${constraints}
 Results:`;
     for (const arg of fArgs) {
-      results =
-        results + `\n${arg.getZ3Expr()} = ${model.eval(arg.getZ3Expr())}`;
+      results += `\n${arg.getZ3Expr()} = ${model.eval(arg.getZ3Expr())}`;
     }
 
     console.log(results);
