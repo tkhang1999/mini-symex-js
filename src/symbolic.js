@@ -6,8 +6,8 @@ export const symbolicBool = (expr, shouldNegate) => {
   let result = undefined;
 
   if (shouldNegate !== "true") {
-    // if this condition is encountered for the first time as "args[counter] === undefined",
-    // a child process will be spawned to negate this condition to take another path.
+    // if this expression is encountered for the first time as "args[counter] === undefined",
+    // a child process will be spawned to negate this expression to take an alternative path.
     if (shouldNegate === undefined) {
       // child process to negate "expr"
       const childArgs = [...args, "true"];
@@ -19,9 +19,12 @@ export const symbolicBool = (expr, shouldNegate) => {
         },
       );
       console.log(child.stdout);
+
+      // mark this expression as encountered (should not negate) by the current process
+      // so that subsequent spawned child processes will not try to negate it again
+      args.push("false");
     }
     // current process to not negate "expr"
-    args.push("false");
     solver.assert(expr);
     result = true;
     constraints.push(`assume ${expr}`);
