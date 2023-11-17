@@ -5,16 +5,21 @@ A mini symbolic execution engine written in JavaScript, to illustrate some basic
 This work is inspired by [mini-mc](http://github.com/xiw/mini-mc) and [mini-symex](https://github.com/foreverbell/mini-symex). 
 
 ## How to run?
+1. Prerequisites
 
-1. Install dependencies
-```
-$ npm install
+Make sure to have `python3`, `python3-disutils`, and `make` installed on your MacOS/Linux machine. Otherwise, the installation of `z3javascript` may fail.
+
+2. Install dependencies
+```sh
+$ cd mini-symex-js
+$ npm install --loglevel verbose # this may take a while to complete
 $ cd node_modules/z3javascript
 $ npm run prepublish
 ```
-  
-2. Run a simple example in `app.js`
-```
+
+3. Run a simple example in `app.js`
+```sh
+$ cd mini-symex-js
 $ npm run symbolic
 ```
 
