@@ -5,6 +5,7 @@ import { Fraction } from "fractional";
 let z3Utils = new Z3Utils();
 let z3Ctx = z3Utils.getZ3Ctx();
 let solver = z3Utils.getSolver();
+
 let trace = [];
 
 const concolicBool = (expr) => {
@@ -47,7 +48,7 @@ export class ConcolicNumber {
   }
 
   [Symbol.for("===")](other) {
-    return concolicBool(z3Ctx.mkEq(this.expr, getNumZ3Expr(other)), trace);
+    return concolicBool(z3Ctx.mkEq(this.expr, getNumZ3Expr(other)));
   }
 
   [Symbol.for("==")](other) {
@@ -66,19 +67,19 @@ export class ConcolicNumber {
   }
 
   [Symbol.for("<")](other) {
-    return concolicBool(z3Ctx.mkLt(this.expr, getNumZ3Expr(other)), trace);
+    return concolicBool(z3Ctx.mkLt(this.expr, getNumZ3Expr(other)));
   }
 
   [Symbol.for("<=")](other) {
-    return concolicBool(z3Ctx.mkLe(this.expr, getNumZ3Expr(other)), trace);
+    return concolicBool(z3Ctx.mkLe(this.expr, getNumZ3Expr(other)));
   }
 
   [Symbol.for(">")](other) {
-    return concolicBool(z3Ctx.mkGt(this.expr, getNumZ3Expr(other)), trace);
+    return concolicBool(z3Ctx.mkGt(this.expr, getNumZ3Expr(other)));
   }
 
   [Symbol.for(">=")](other) {
-    return concolicBool(z3Ctx.mkGe(this.expr, getNumZ3Expr(other)), trace);
+    return concolicBool(z3Ctx.mkGe(this.expr, getNumZ3Expr(other)));
   }
 
   [Symbol.for("+")](other) {
@@ -142,6 +143,7 @@ export const concolicFuzz = (f, args, values) => {
     trace.forEach((expr) => solver.assert(expr));
     let isSat = solver.check();
     solver.pop();
+
     if (isSat) {
       let model = solver.getModel();
       let newValues = args.map((arg) => model.eval(arg.getZ3Expr()));
