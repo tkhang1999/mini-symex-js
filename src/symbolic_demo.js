@@ -1,7 +1,10 @@
-import { SymbolicNumber, symExe } from "./symbolic.js";
+import { SymbolicNumber, symbolicExe } from "./symbolic.js";
 import { strict as assert } from "assert";
 
-const test = (x, y, z) => {
+/**
+ * Symbolic Execution
+ */
+const symf = (x, y, z) => {
   if (x === y ** 2) {
     const t = y * -2.5 + 1;
     if (t > z + 3) {
@@ -13,10 +16,9 @@ const test = (x, y, z) => {
   }
 };
 
-const fArgs = [
+const symfArgs = [
   new SymbolicNumber("x"),
   new SymbolicNumber("y"),
   new SymbolicNumber("z"),
 ];
-
-symExe(test, fArgs);
+symbolicExe(symf, symfArgs);

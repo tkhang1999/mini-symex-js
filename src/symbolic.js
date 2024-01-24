@@ -1,8 +1,18 @@
-import { solver, readCounter, args, constraints, z3Ctx } from "./utils";
+import { Z3Utils } from "./utils";
 import { spawnSync } from "child_process";
+import { strict as assert } from "assert";
 import { Fraction } from "fractional";
 
-export const symbolicBool = (expr, shouldNegate) => {
+let z3Utils = new Z3Utils();
+let z3Ctx = z3Utils.getZ3Ctx();
+let solver = z3Utils.getSolver();
+
+let counter = 0;
+const constraints = [];
+// optional arguments where args[i] indicates whether the i-th boolean expression should be negated
+const args = process.argv.slice(2);
+
+const symbolicBool = (expr, shouldNegate) => {
   let result = undefined;
 
   if (shouldNegate !== "true") {
@@ -50,6 +60,7 @@ const getNumZ3Expr = (i) => {
     const { numerator, denominator } = new Fraction(i);
     return z3Ctx.mkDiv(z3Ctx.mkIntVal(numerator), z3Ctx.mkIntVal(denominator));
   }
+  assert(i instanceof SymbolicNumber, `${i} is not a SymbolicNumber object`);
   return i.getZ3Expr();
 };
 
@@ -72,7 +83,7 @@ export class SymbolicNumber {
   [Symbol.for("===")](other) {
     return symbolicBool(
       z3Ctx.mkEq(this.expr, getNumZ3Expr(other)),
-      args[readCounter()],
+      args[counter++],
     );
   }
 
@@ -83,7 +94,7 @@ export class SymbolicNumber {
   [Symbol.for("!==")](other) {
     return symbolicBool(
       z3Ctx.mkNot(z3Ctx.mkEq(this.expr, getNumZ3Expr(other))),
-      args[readCounter()],
+      args[counter++],
     );
   }
 
@@ -94,28 +105,28 @@ export class SymbolicNumber {
   [Symbol.for("<")](other) {
     return symbolicBool(
       z3Ctx.mkLt(this.expr, getNumZ3Expr(other)),
-      args[readCounter()],
+      args[counter++],
     );
   }
 
   [Symbol.for("<=")](other) {
     return symbolicBool(
       z3Ctx.mkLe(this.expr, getNumZ3Expr(other)),
-      args[readCounter()],
+      args[counter++],
     );
   }
 
   [Symbol.for(">")](other) {
     return symbolicBool(
       z3Ctx.mkGt(this.expr, getNumZ3Expr(other)),
-      args[readCounter()],
+      args[counter++],
     );
   }
 
   [Symbol.for(">=")](other) {
     return symbolicBool(
       z3Ctx.mkGe(this.expr, getNumZ3Expr(other)),
-      args[readCounter()],
+      args[counter++],
     );
   }
 
@@ -146,9 +157,13 @@ export class SymbolicNumber {
   getZ3Expr() {
     return this.expr;
   }
+
+  toString() {
+    return this.expr.toString();
+  }
 }
 
-export const symExe = (f, fArgs) => {
+export const symbolicExe = (f, fArgs) => {
   try {
     f(...fArgs);
   } catch (e) {

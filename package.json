@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "type": "commonjs",
-  "main": "src/app.js",
   "scripts": {
     "build:z3javascript": "cd ./node_modules/z3javascript && npm install",
     "build": "babel src -d dist",
-    "symbolic": "export Z3_PATH=./node_modules/z3javascript/bin/libz3.so && npm run build && node dist/app.js",
+    "symbolic": "export Z3_PATH=./node_modules/z3javascript/bin/libz3.so && npm run build && node dist/symbolic_demo.js",
+    "concolic": "export Z3_PATH=./node_modules/z3javascript/bin/libz3.so && npm run build && node dist/concolic_demo.js",
     "prettier": "prettier . --write",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

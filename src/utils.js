@@ -1,16 +1,19 @@
 import Z3 from "z3javascript";
 
-export const z3Ctx = new Z3.Context();
+export class Z3Utils {
+  #z3Ctx;
+  #solver;
 
-export const solver = new Z3.Solver(z3Ctx, false, []);
+  constructor() {
+    this.#z3Ctx = new Z3.Context();
+    this.#solver = new Z3.Solver(this.#z3Ctx, false, []);
+  }
 
-let counter = 0;
+  getZ3Ctx() {
+    return this.#z3Ctx;
+  }
 
-export const readCounter = () => {
-  return counter++;
-};
-
-// optional arguments where args[i] indicates whether the i-th boolean expression should be negated
-export const args = process.argv.slice(2);
-
-export const constraints = [];
+  getSolver() {
+    return this.#solver;
+  }
+}
