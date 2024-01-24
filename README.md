@@ -19,13 +19,10 @@ $ cd node_modules/z3javascript
 $ npm run prepublish
 ```
 
-3. Run a simple example in `app.js`
+3. Run demo
 
 ```sh
 $ cd mini-symex-js
 $ npm run symbolic
+$ npm run concolic
 ```
-
-## TODO
-
-Implement a concolic execution engine.
