@@ -115,9 +115,9 @@ export class ConcolicNumber {
   }
 }
 
-export const concolicFuzz = (f, args, values) => {
+export const concolicFuzz = (f, args, values, iter = 0) => {
   assert(args.length === values.length);
-  console.log(`\nFuzzing ${f.name} with args ${args} and values ${values}`);
+  console.log(`\n#${iter}: Fuzzing ${f.name} with args ${args} and values ${values}`);
 
   trace = [];
 
@@ -132,22 +132,25 @@ export const concolicFuzz = (f, args, values) => {
   }
   solver.pop();
 
-  // as the current trace has been explored, we negate it to explore new paths
+  // mark the current trace as done to avoid infinite loop
   if (trace.length !== 0) {
+    console.log(`Trace: ${trace}`);
     solver.assert(z3Ctx.mkNot(z3Ctx.mkAndList(trace)));
   }
 
-  while (trace.length !== 0) {
+  // explore the other traces
+  const localTrace = trace.slice();
+  while (localTrace.length !== 0) {
     solver.push();
-    solver.assert(z3Ctx.mkNot(trace.pop()));
-    trace.forEach((expr) => solver.assert(expr));
+    solver.assert(z3Ctx.mkNot(localTrace.pop()));
+    localTrace.forEach((expr) => solver.assert(expr));
     let isSat = solver.check();
     solver.pop();
 
     if (isSat) {
       let model = solver.getModel();
       let newValues = args.map((arg) => model.eval(arg.getZ3Expr()));
-      concolicFuzz(f, args, newValues);
+      concolicFuzz(f, args, newValues, iter + 1);
     }
   }
 };
