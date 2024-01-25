@@ -26,3 +26,5 @@ $ cd mini-symex-js
 $ npm run symbolic
 $ npm run concolic
 ```
+
+**Note**: For MacOS, replace `libz3.so` in `package.json` with `libz3.dylib`
